@@ -6,7 +6,7 @@ CACS456 Machine Learning Project Demo
 
 * Poetry https://python-poetry.org/
 * Pydentic https://docs.pydantic.dev/latest/
-* 
+* Streamlit https://docs.streamlit.io/
 
 ## Installation
 
@@ -31,5 +31,15 @@ poetry add <package_name>
 ```
 
 ## Uses
+### API
+```bash 
+python cacs456_ml/main.py
+```
+
+### Demo webapp
+```bash
+export PYTHONPATH=$(pwd)
+streamlit run webapp/app.py
+```
 
 ## References
