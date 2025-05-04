@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "cacs456ml"
+version = "1.0.0"
+description = "CACS456 Machine Learning Project Demo"
+authors = ["ashokpant <asokpant@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.12"
+numpy = "2.2.5"
+pandas = "2.0.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
