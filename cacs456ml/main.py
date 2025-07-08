@@ -8,8 +8,10 @@ import os
 import sys
 
 from fastapi.middleware.cors import CORSMiddleware
+from cacs456ml.repo import datasource  
 
-from cacs456ml.api import health_router, recommendation_router
+
+from cacs456ml.api import health_router, recommendation_router, notes_router
 from cacs456ml.setting import Settings
 from cacs456ml.util import loggerutil
 
@@ -41,8 +43,12 @@ app.add_middleware(
 
 app.include_router(health_router.router)
 app.include_router(recommendation_router.router, prefix="")
+app.include_router(notes_router.router)
+
 
 if __name__ == "__main__":
     loggerutil.setup_logging()
     uvicorn.run("main:app", host="0.0.0.0", port=Settings.API_PORT, reload=False,
                 loop="asyncio", )
+
+

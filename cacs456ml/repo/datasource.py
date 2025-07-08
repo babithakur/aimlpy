@@ -146,3 +146,16 @@ class DataSource:
                         logger.info(f"Column '{column.name}' added to table '{table.name}'.")
         except Exception as e:
             logger.exception(f"Error adding columns to table '{table.name}': {e}")
+
+
+
+
+data_source = DataSource()
+
+
+def get_db():
+    db = data_source.get_session()
+    try:
+        yield db
+    finally:
+        data_source.close_session(db)
