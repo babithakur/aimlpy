@@ -4,14 +4,14 @@
 -- Created on: 04/05/2025
 """
 
-from sqlalchemy import Column, String, DateTime, func
+from sqlalchemy import Column, String, DateTime, func, Integer
 
-from cacs456ml.repo.datasource import Base
+from aimlpy.repo.datasource import Base
 
 
 class UserRecord(Base):
     __tablename__ = 'user'
-    user_id = Column(String, primary_key=True)
+    user_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     email = Column(String)
     name = Column(String)
     address = Column(String)

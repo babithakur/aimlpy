@@ -8,12 +8,10 @@ import os
 import sys
 
 from fastapi.middleware.cors import CORSMiddleware
-from cacs456ml.repo import datasource  
 
-
-from cacs456ml.api import health_router, recommendation_router, notes_router
-from cacs456ml.setting import Settings
-from cacs456ml.util import loggerutil
+from aimlpy.api import health_router, recommendation_router, notes_router
+from aimlpy.setting import Settings
+from aimlpy.util import loggerutil
 
 sys.path.append(os.getcwd())
 
@@ -26,10 +24,10 @@ from fastapi import FastAPI
 
 logger = loggerutil.get_logger(__name__)
 app = FastAPI(
-    title="CACS456 ML API",
-    description="ML API",
+    title="Python AI/ML API",
+    description="Demo API",
     version="1.0.0",
-    author="Ashok Kumar Pant",
+    author="Ashok Pant",
     email="ashok@treeleaf.ai",
 )
 
@@ -45,10 +43,7 @@ app.include_router(health_router.router)
 app.include_router(recommendation_router.router, prefix="")
 app.include_router(notes_router.router)
 
-
 if __name__ == "__main__":
     loggerutil.setup_logging()
     uvicorn.run("main:app", host="0.0.0.0", port=Settings.API_PORT, reload=False,
                 loop="asyncio", )
-
-

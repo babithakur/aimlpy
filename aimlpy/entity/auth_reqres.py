@@ -3,8 +3,8 @@
 -- Email: asokpant@gmail.com
 -- Created on: 04/05/2025
 """
-from cacs456ml.entity.auth import Session
-from cacs456ml.entity.common import BaseRequest, BaseResponse
+from aimlpy.entity.auth import Session
+from aimlpy.entity.common import BaseRequest, BaseResponse
 
 
 class LoginRequest(BaseRequest):

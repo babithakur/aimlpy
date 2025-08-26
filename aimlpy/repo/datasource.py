@@ -1,38 +1,32 @@
-"""
--- Created by: Ashok Kumar Pant
--- Email: asokpant@gmail.com
--- Created on: 23/10/2024
-"""
+from contextlib import contextmanager
 
 from sqlalchemy import create_engine, text
 from sqlalchemy import inspect
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import sessionmaker, Session, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, Session
+from treeutil.singleton import Singleton
 
-from cacs456ml.setting import Settings
-from cacs456ml.util import loggerutil
-
-
-class Base(DeclarativeBase):
-    pass
-
+from aimlpy.model.model_base import Base
+from aimlpy.setting import Settings
+from aimlpy.util import loggerutil
 
 logger = loggerutil.get_logger(__name__)
 
 
-class DataSource:
+class DataSource(metaclass=Singleton):
     def __init__(self):
         """
         Initializes the DataSource with the given database URL
         """
         try:
-            self.engine = create_engine(Settings.DB_URL,
-                                        pool_size=20,
-                                        max_overflow=30,
-                                        pool_timeout=60,
+            db_url = Settings.DATABASE_URL
+            if not db_url or db_url.strip() == "":
+                raise ValueError("DATABASE_URL is not set. Please check your .env file.")
+            logger.info(f"Using DATABASE_URL: {db_url}")
+            self.engine = create_engine(db_url, pool_size=20, max_overflow=30, pool_timeout=60,
                                         pool_recycle=3600)
-            self.ping()
             self.Session = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+            self.ping()
             self.create_or_migrate_tables()
         except Exception as e:
             logger.exception(f"Database connection error: {e}")
@@ -61,13 +55,6 @@ class DataSource:
         if session:
             session.close()
 
-    # def create_tables(self):
-    #     """
-    #     Creates all tables in the database using the Base metadata.
-    #     This method should be run once when you want to initialize the tables.
-    #     """
-    #     Base.metadata.create_all(bind=self.engine)
-
     def create_or_migrate_tables(self):
         """
         Create tables if they do not exist, or migrate (modify schema) if necessary.
@@ -87,12 +74,7 @@ class DataSource:
         Creates all tables in the database using the Base metadata if they do not exist.
         """
         try:
-            # Check if tables already exist
-            if not self.check_tables_exist():
-                Base.metadata.create_all(bind=self.engine)
-                logger.info("Tables created successfully.")
-            else:
-                logger.info("Tables already exist.")
+            Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             logger.exception(f"Error creating tables: {e}")
             exit(1)
@@ -136,26 +118,32 @@ class DataSource:
             with self.engine.connect() as connection:
                 for column in table.columns:
                     if column.name not in existing_columns:
-                        # Generate raw SQL for adding a column
-                        column_type = column.type.compile(dialect=self.engine.dialect)  # Get column type
+                        column_type = column.type.compile(dialect=self.engine.dialect)
                         alter_stmt = f'ALTER TABLE "{table.name}" ADD COLUMN {column.name} {column_type}'
 
                         logger.info(f"Executing: {alter_stmt}")
                         connection.execute(text(alter_stmt))
+                        connection.commit()  # Ensure the DDL is committed
 
                         logger.info(f"Column '{column.name}' added to table '{table.name}'.")
         except Exception as e:
             logger.exception(f"Error adding columns to table '{table.name}': {e}")
 
+    @contextmanager
+    def session_scope(self):
+        session = self.get_session()
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            self.close_session(session)
 
 
-
-data_source = DataSource()
-
-
-def get_db():
-    db = data_source.get_session()
-    try:
-        yield db
-    finally:
-        data_source.close_session(db)
+if __name__ == "__main__":
+    ds = DataSource()
+    print("Tables", list(Base.metadata.tables.keys()))
+    Base.metadata.create_all(bind=ds.engine)
+    print("All tables created.")

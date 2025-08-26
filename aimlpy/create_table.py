@@ -2,8 +2,8 @@ from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
 
-from cacs456ml.repo.datasource import Base
-from cacs456ml.model.user_notes import UserNotes  
+from aimlpy.repo.datasource import Base
+from aimlpy.model.user_notes import UserNotes  
 
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))

@@ -8,7 +8,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from cacs456ml.entity.user import User
+from aimlpy.entity.user import User
 
 
 class Session(BaseModel):

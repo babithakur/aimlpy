@@ -1,6 +1,6 @@
-# cacs456-ml
+# aimlpy
 
-CACS456 Machine Learning Project Demo
+Python Service Sample Project
 
 ## Dependencies
 

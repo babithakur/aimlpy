@@ -4,8 +4,8 @@
 -- Created on: 04/05/2025
 """
 
-from cacs456ml.entity.common import BaseRequest, BaseResponse, Pagination
-from cacs456ml.entity.user import User
+from aimlpy.entity.common import BaseRequest, BaseResponse, Pagination
+from aimlpy.entity.user import User
 
 
 class AddUserRequest(BaseRequest):

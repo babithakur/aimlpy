@@ -5,10 +5,10 @@
 """
 from fastapi import APIRouter
 
-from cacs456ml.entity.common import ErrorCode
-from cacs456ml.entity.recommendation_reqres import GetRecommendationResponse, GetRecommendationRequest
-from cacs456ml.service.recommendation_service import RecommendationService
-from cacs456ml.util import loggerutil
+from aimlpy.entity.common import ErrorCode
+from aimlpy.entity.recommendation_reqres import GetRecommendationResponse, GetRecommendationRequest
+from aimlpy.service.recommendation_service import RecommendationService
+from aimlpy.util import loggerutil
 
 logger = loggerutil.get_logger(__name__)
 

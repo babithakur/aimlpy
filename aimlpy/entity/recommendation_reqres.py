@@ -3,8 +3,8 @@
 -- Email: asokpant@gmail.com
 -- Created on: 04/05/2025
 """
-from cacs456ml.entity.common import BaseRequest, BaseResponse
-from cacs456ml.entity.recommendation import Recommendation
+from aimlpy.entity.common import BaseRequest, BaseResponse
+from aimlpy.entity.recommendation import Recommendation
 
 
 class GetRecommendationRequest(BaseRequest):

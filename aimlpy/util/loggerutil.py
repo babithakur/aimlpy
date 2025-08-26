@@ -3,7 +3,7 @@
 -- Email: asokpant@gmail.com
 -- Created on: 04/05/2025
 """
-from cacs456ml.setting import Settings
+from aimlpy.setting import Settings
 
 """
 -- Created by: Ashok Kumar Pant
