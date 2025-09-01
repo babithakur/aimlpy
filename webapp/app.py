@@ -18,8 +18,8 @@ if st.button("Get Recommendation"):
         response = requests.get(url, params={"user_id": user_id, "top_n": 10})
         data = response.json()
         if response.status_code == 200:
-            st.write(f"Recommendation: {data["recommendations"]}")
+            st.write(f"Recommendation: {data['recommendations']}")
         else:
-            st.write(f"Error: {data["error_code"]} - {data["message"]}")
+            st.write(f"Error: {data['error_code']} - {data['message']}")
     else:
         st.write("Please enter a user_id.")

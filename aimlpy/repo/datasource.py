@@ -6,6 +6,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker, Session
 from treeutil.singleton import Singleton
 
+
 from aimlpy.model.model_base import Base
 from aimlpy.setting import Settings
 from aimlpy.util import loggerutil
@@ -141,6 +142,14 @@ class DataSource(metaclass=Singleton):
         finally:
             self.close_session(session)
 
+    @classmethod
+    def get_session_dependency(cls):
+        instance = cls()  
+        session = instance.get_session()  
+        try:
+            yield session
+        finally:
+            session.close()
 
 if __name__ == "__main__":
     ds = DataSource()

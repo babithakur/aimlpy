@@ -9,7 +9,7 @@ import sys
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from aimlpy.api import health_router, recommendation_router, notes_router
+from aimlpy.api import health_router, recommendation_router, notes_router, documents_router
 from aimlpy.setting import Settings
 from aimlpy.util import loggerutil
 
@@ -42,6 +42,7 @@ app.add_middleware(
 app.include_router(health_router.router)
 app.include_router(recommendation_router.router, prefix="")
 app.include_router(notes_router.router)
+app.include_router(documents_router.router)
 
 if __name__ == "__main__":
     loggerutil.setup_logging()
