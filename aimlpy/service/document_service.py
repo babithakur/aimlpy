@@ -9,16 +9,16 @@ from aimlpy.repo.datasource import DataSource
 from fastapi import UploadFile, Query
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
+from sklearn.metrics.pairwise import cosine_similarity
 
 UPLOAD_DIR = "uploads" 
 model = SentenceTransformer("all-MiniLM-L6-v2")
-
 
 class DocumentService:
     def __init__(self, session: Optional[Session] = None):
         self.session: Session = session or DataSource().get_session()
 
-    async def add_document(self, title: str, file: UploadFile) -> PDFDocument:
+    async def add_document(self, title: str, file: UploadFile) -> Optional[PDFDocument]:
         try:
             if not title.strip():
                 raise ValueError("Title cannot be empty.")
@@ -34,7 +34,7 @@ class DocumentService:
 
             metadata = extract_pdf_metadata(file_location)
             doc_title = metadata.get("title") or title
-            author = metadata.get("author")
+            author = metadata.get("author") or "Unknown"
             summary = metadata.get("summary")
             keywords = metadata.get("keywords")
             created_at = metadata.get("created_at")
@@ -45,6 +45,19 @@ class DocumentService:
 
             embedding = model.encode(text_for_embedding).tolist()
 
+            #plagiarism check
+            existing_docs = self.session.query(PDFDocument).all()
+            existing_embeddings = [doc.embedding for doc in existing_docs if doc.embedding]
+            existing_authors = [doc.author for doc in existing_docs]
+
+            if existing_embeddings:
+                similarity_scores = cosine_similarity([embedding], existing_embeddings)[0]
+                for i, score in enumerate(similarity_scores):
+                    if score > 0.85 and existing_authors[i] != author:
+                        print(f"Plagiarism detected: Similarity {score:.2f} with author {existing_authors[i]}")
+                        return None  #abort upload
+
+            #save document
             new_doc = PDFDocument(
                 title=doc_title,
                 author=author,
@@ -66,7 +79,6 @@ class DocumentService:
             raise Exception(f"Failed to add document: {str(e)}")
         finally:
             self.session.close()
-    
 
     async def list_documents(
         self,

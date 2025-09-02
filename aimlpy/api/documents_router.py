@@ -8,7 +8,6 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter(prefix="/document", tags=["Documents"])
 
-
 @router.post("/post", status_code=HTTP_201_CREATED)
 async def upload_document_api(
     title: str = Form(...),
@@ -16,7 +15,13 @@ async def upload_document_api(
 ):
     try:
         service = DocumentService()
-        document = await service.add_document(title, file)  
+        document = await service.add_document(title, file)
+
+        if document is None:
+            raise HTTPException(
+                status_code=409,
+                detail="Plagiarism detected. Document not uploaded."
+            )
 
         return {
             "message": "Document uploaded successfully.",
@@ -30,6 +35,7 @@ async def upload_document_api(
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.get("/list", response_class=JSONResponse)
 async def list_documents(
