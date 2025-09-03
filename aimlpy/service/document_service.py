@@ -152,3 +152,35 @@ class DocumentService:
         top_documents = [doc for doc, _ in scored_docs[:1]]  # return top 1
 
         return top_documents
+    
+    def get_document_path(self, doc_id: int):
+        try:
+            document = self.session.query(PDFDocument).filter(PDFDocument.id == doc_id).first()
+            if not document:
+                raise HTTPException(status_code=404, detail="Document not found in database.")
+            
+            file_path = os.path.join(UPLOAD_DIR, document.filename)
+            return file_path, document.filename
+        finally:
+            self.session.close()
+
+    def delete_document(self, doc_id: int):
+        try:
+            document = self.session.query(PDFDocument).filter(PDFDocument.id == doc_id).first()
+            if not document:
+                raise HTTPException(status_code=404, detail="Document not found.")
+
+            #delete the file from the filesystem
+            file_path = os.path.join(UPLOAD_DIR, document.filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            
+            #delete the document entry from the database
+            self.session.delete(document)
+            self.session.commit()
+            
+        except Exception as e:
+            self.session.rollback()
+            raise Exception(f"Failed to delete document: {str(e)}")
+        finally:
+            self.session.close()

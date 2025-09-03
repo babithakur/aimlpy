@@ -4,7 +4,8 @@ from starlette.status import HTTP_201_CREATED
 from aimlpy.service.document_service import DocumentService
 from aimlpy.repo.datasource import DataSource
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+import os
 
 router = APIRouter(prefix="/document", tags=["Documents"])
 
@@ -90,3 +91,27 @@ def search_documents(
         "query": query,
         "use_semantic": "hybrid"
     })
+
+@router.get("/download/{doc_id}", status_code=200)
+async def download_document_api(doc_id: int):
+    try:
+        service = DocumentService()
+        file_path, filename = service.get_document_path(doc_id)
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="Document not found.")
+        return FileResponse(path=file_path, filename=filename, media_type='application/pdf')
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/delete/{doc_id}", status_code=200)
+async def delete_document_api(doc_id: int):
+    try:
+        service = DocumentService()
+        service.delete_document(doc_id)
+        return JSONResponse(content={"message": "Document deleted successfully."})
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
